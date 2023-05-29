@@ -1,5 +1,5 @@
 [project]
-name = "enigma"
+name = "enigma-cipher-machine"
 version = "0.0.1"
 authors = [
   { name="Raymas", email="IgnaceCousteau@protonmail.com" },
