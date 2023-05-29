@@ -4,7 +4,19 @@
     <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Enigma-logo.jpg" alt="Engima logo" />
 </p>
 
-The enigma machine in python.
+The enigma cipher machine in python.
+
+## Getting started
+
+Get the library:
+
+```python
+pip install enigma-cipher-machine
+```
+
+We use pure python, no dependency required and tested on python 3.10.6.
+
+To run tests please install **pytest**.
 
 ## The Machine
 
@@ -123,19 +135,6 @@ We use the M3 machine and the following setup:
 | Text          | Hello world                       |
 
 The enigma produces: ```fsqsj fusta```
-
-
-## Getting started
-
-Get the library: 
-
-```python
-pip install enigma-machine
-```
-
-We use pure python, no dependency required and tested on python 3.10.6.
-
-To run tests please install **pytest**.
 
 ## Usage
 
