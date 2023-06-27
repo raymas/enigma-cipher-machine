@@ -18,9 +18,9 @@ class Plugboard:
     def active_len(self):
         return len(self.pairs)
 
-    def randomize(self):
+    def randomize(self, pairs=10):
         alphabet = string.ascii_lowercase
-        while self.active_len() < 10:
+        while self.active_len() < pairs:
             a = random.choice(alphabet)
             alphabet = alphabet.replace(a, "")
             b = random.choice(alphabet)

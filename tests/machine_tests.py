@@ -1,17 +1,13 @@
 from enigma.machine import Machine
 from enigma.plugboard import Plugboard
-from enigma.rotor import Rotors
+from enigma.rotor import Rotors, Rotor
+import string
+
 
 def test_hello_world():
     tests = [
-        {
-            "entry": "hello world",
-            "result": "fsqsj fusta"
-        },
-        {
-            "entry": "xgytk npnkq ssnxw kyf", # Alan Mathison Turing
-            "result": ""
-        }
+        {"entry": "hello world", "result": "fsqsj fusta"},
+        {"entry": "xgytk npnkq ssnxw kyf", "result": "alanm athis ontur ing"},
     ]
 
     for test in tests:
@@ -19,14 +15,8 @@ def test_hello_world():
 
         M3 = Machine(
             "M3",
-            [
-                Rotors.M3.ETW,
-                Rotors.M3.I,
-                Rotors.M3.II,
-                Rotors.M3.III,
-                Rotors.M3.UKWC
-            ],
-            p
+            [Rotors.M3.ETW, Rotors.M3.I, Rotors.M3.II, Rotors.M3.III, Rotors.M3.UKWC],
+            p,
         )
 
         M3.set_rotor_position("I", "A")
@@ -39,7 +29,7 @@ def test_hello_world():
 
         ciphertext = M3.encode(test["entry"])
 
-        assert(ciphertext == test["result"])
+        assert ciphertext == test["result"]
 
         M3.reset()
 
@@ -53,7 +43,7 @@ def test_hello_world():
 
         plaintext = M3.encode(test["result"])
 
-        assert(plaintext == test["entry"])
+        assert plaintext == test["entry"]
 
 
 def test_decode_M4_U534():
@@ -96,29 +86,88 @@ def test_decode_M4_U534():
 
     plaintext = M4.encode(ciphertext, split=0, debug=False)
 
-    assert(plaintext == """krkrallexxfolgendesistsofortbekanntzugebenxxichhabefolgelnbebefehlerhaltenxxjansterledesbisherigxnreichsmarschallsjgoeringjsetztderfuehrersieyhvrrgrzssadmiralyalsseinennachfolgereinxschriftlschevollmachtunterwegsxabsofortsollensiesaemtlichemassnahmenverfuegenydiesichausdergegenwaertigenlageergebenxgezxreichsleiteikktulpekkjbormannjxxobxdxmmmdurnhfkstxkomxadmxuuubooiexkp""")
+    assert (
+        plaintext
+        == """krkrallexxfolgendesistsofortbekanntzugebenxxichhabefolgelnbebefehlerhaltenxxjansterledesbisherigxnreichsmarschallsjgoeringjsetztderfuehrersieyhvrrgrzssadmiralyalsseinennachfolgereinxschriftlschevollmachtunterwegsxabsofortsollensiesaemtlichemassnahmenverfuegenydiesichausdergegenwaertigenlageergebenxgezxreichsleiteikktulpekkjbormannjxxobxdxmmmdurnhfkstxkomxadmxuuubooiexkp"""
+    )
+
 
 def test_double_stepping():
     plugboard = Plugboard("")
 
     M3 = Machine(
         "M3",
-        [
-            Rotors.M3.ETW,
-            Rotors.M3.I,
-            Rotors.M3.II,
-            Rotors.M3.III,
-            Rotors.M3.UKWC
-        ],
-        plugboard
+        [Rotors.M3.ETW, Rotors.M3.I, Rotors.M3.II, Rotors.M3.III, Rotors.M3.UKWC],
+        plugboard,
     )
 
     M3.set_rotor_position("I", "Q")
     M3.set_rotor_position("II", "D")
     M3.set_rotor_position("III", "A")
 
-    M3.encode("aaa") # three rotation
+    M3.encode("aaa")  # three rotation
 
     rotors = M3.get_position()
 
-    assert(rotors[0].letter == "b" and rotors[1].letter == "f" and rotors[2].letter == "t")
+    assert (
+        rotors[0].letter == "b" and rotors[1].letter == "f" and rotors[2].letter == "t"
+    )
+
+
+# http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
+def test_decode_M3_manual():
+    M3 = Machine(
+        "M3",
+        [
+            Rotors.M3.ETW,
+            Rotors.M3.III,
+            Rotors.M3.I,
+            Rotors.M3.II,
+            Rotor("UKWA", "EJMZALYXVBWFCRQUONTSPIKHGD", "", reflector=True),
+        ],
+        Plugboard("AM FI NV PS TU WZ"),
+    )
+
+    M3.set_rotor_position("II", "A")
+    M3.set_rotor_position("I", "B")
+    M3.set_rotor_position("III", "L")
+
+    M3.set_rotor_ringstellung("II", string.ascii_lowercase[24 - 1])
+    M3.set_rotor_ringstellung("I", string.ascii_lowercase[13 - 1])
+    M3.set_rotor_ringstellung("III", string.ascii_lowercase[22 - 1])
+
+    plaintext = M3.encode(
+        "GCDSE AHUGW TQGRK VLFGX UCALX VYMIG MMNMF DXTGN VHVRM MEVOU YFZSL RHDRR XFJWC FHUHM UNZEF RDISI KBGPM YVXUZ",
+        split=0,
+    )
+
+    assert (
+        plaintext
+        == "feindliqeinfanteriekolonnebeobaqtetxanfangsuedausgangbaerwaldexendedreikmostwaertsneustadt"
+    )
+
+
+def test_decode_enigma_K():
+    K = Machine(
+        "K",
+        [
+            Rotor("ETWK", "QWERTZUIOASDFGHJKPYXCVBNML", "", rotate=False),
+            Rotor("KII", "CJGDPSHKTURAWZXFMYNQOBVLIE", "N"),
+            Rotor("KI", "LPGSZMHAEOQKVXRFYBUTNICJDW", "Y"),
+            Rotor("KII", "CJGDPSHKTURAWZXFMYNQOBVLIE", "N"),
+            Rotor("UKWK", "IMETCGFRAYSQBZXWLHKDVUPOJN", "", reflector=True),
+        ],
+        Plugboard(""),
+    )
+
+    # 26 17 16 13
+    K.set_rotor_ringstellung("KII", string.ascii_lowercase[13 - 1])
+    K.set_rotor_ringstellung("KI", string.ascii_lowercase[16 - 1])
+    K.set_rotor_ringstellung("KIII", string.ascii_lowercase[17 - 1])
+    K.set_rotor_ringstellung("UKWK", string.ascii_lowercase[26 - 1])
+
+    plaintext = K.encode("QSZVI DVMPN EXACM RWWXU IYOTY NGVVX DZ---", split=0)
+
+    assert(
+        plaintext == ""
+    )

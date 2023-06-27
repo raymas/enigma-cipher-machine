@@ -20,7 +20,7 @@ To run tests please install **pytest**.
 
 ## The Machine
 
-Built by the German Scherbius & Ritter company in the early 20th century, the enigma machine is a cipher machine. The machine performs substitution : it encodes a letter from the alphabet to another one.
+Built by the German Scherbius & Ritter company in the early 20th century, the enigma machine is a cipher machine. The machine performs substitution: it encodes a letter from the alphabet to another one.
 
 <p align="center">
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Enigma_%28crittografia%29_-_Museo_scienza_e_tecnologia_Milano.jpg" alt="Engima machine" height="400"/>
@@ -28,29 +28,31 @@ Built by the German Scherbius & Ritter company in the early 20th century, the en
 
 The machine is composed of the following elements:
 
-- a keyboard for user input
-- multiple rotors which are rotating parts that perform the cipher operation using a scrambled electrical wiring
-- a front panel plugboard to allow additionnal substitution making the deciphering operation insanely more difficult (over 150,738,274,937,250 additionnal substitutions using 10 pairs)
+- a keyboard for user input,
+- multiple rotors which are rotating parts that perform the cipher operation using a scrambled electrical wiring,
+- a front panel plugboard allowing an additionnal substitution. This make the deciphering operation insanely more difficult (over 150,738,274,937,250 additionnal substitutions using 10 pairs),
 - a light panel with 26 lamps labeled from A to Z.
 
 The cipher process can be described as follow :
 
+```
 Keyboard -> Plugboard -> Entry Wheel -> Rotors (from 1 to x) -> Reflector -> Rotors (from x to 1) -> Entry Wheel -> Plugboard -> Light Panel
+```
 
-The user press a letter on the keyboard making the first rotor to rotate. The keyboard press close an electrical circuit, allowing the current to enter the plugboard, the entry wheel, each rotor and the reflector (a non rotating wheel). From there the electrical current makes it way back to the light panel, lighting up the alphabet letter corresponding to the cipher letter.
+The user press a letter on the keyboard making the first rotor to rotate. The keyboard press close an electrical circuit, allowing the current to enter the plugboard, the entry wheel, each rotor and the reflector (a non rotating wheel). From there the electrical current makes its way back to the light panel, lighting up the alphabet letter corresponding to the scrambled letter.
 
 ### Rotors
 
-Rotors are the rotating part of the enigma machine. Most machines contains three of them but an additionnal one can be found (e.g. M4 variant for the Kriegsmarine with the _greek_ wheel).
+Rotors are the rotating part of the enigma machine. Most machines contains three of them but an additionnal one can be found on some variant (e.g. M4 variant for the Kriegsmarine with the _greek_ wheel).
 
-Rotors' positions are numbered from A to Z and possess turnovers positions. When a rotor reach a turnover position, it rotates its closest neighbour.
+Rotors' positions are numbered from A to Z and possess turnover positions. When a rotor reach a turnover position, it rotates its closest left neighbour.
 
 Rotors' internal wiring can be shifted prior any operation by rotating a ring to a certain position. This setting is often called the _Ringstellung_.
 
-The wiring pattern is usely represented with an alphabeter string. Each alphabet chacracter is replaced by the corresponding letter in the string. For instance the string: **EKMFLGDQVZNTOWYHXUSPAIBRCJ** means that a **A** substitute to an **E**, a **B** to an **K** and so on. The same logic applies for the remaining character as shown below.
+The wiring pattern is usely represented with an alphabeter string. Each alphabet chacracter is replaced by the corresponding letter in the string. For instance the string: **EKMFLGDQVZNTOWYHXUSPAIBRCJ** means that a **A** substitute to an **E**, a **B** to an **K** and so on. The same logic applies for the remaining characters as shown below.
 
 ```
-ABCDEFGHIJKLMNOPQRSTUVWXYZ      keyboard    reflector  
+ABCDEFGHIJKLMNOPQRSTUVWXYZ      keyboard    reflector
 ||||||||||||||||||||||||||         ↓            ↑
 EKMFLGDQVZNTOWYHXUSPAIBRCJ      reflector   keyboard
 ```
@@ -74,12 +76,14 @@ EKMFLGDQVZNTOWYHXUSPAIBRCJ
 We can represent the shift with the following equations:
 
 From the keyboard to the reflector (alphabet to rotor's wiring)
+
 ```
 wiring_letter = letter + position - ringstellung
 cipher_letter = wire.at(wiring_letter) - position + ringstellung
 ```
 
 From the reflector to the light panel (rotor's wiring to alphabet)
+
 ```
 wiring_letter = letter + position - rinsgtellung
 cipher_letter = wire.index(wiring_letter) - position + ringstellung
@@ -87,29 +91,29 @@ cipher_letter = wire.index(wiring_letter) - position + ringstellung
 
 The reflector is considered as a one-way (keyboard to reflector), non rotating "rotor".
 
-Enigma machines that use a lever suffers an abnormal rotation when the center rotor reaches its turnover position, all the rotors are increment one step further.
+Enigma machines that use a lever suffer an abnormal rotation when the center rotor reaches its turnover position. If so, all the rotors are increment one step further.
 Let's illustrate this anomaly.
 
 - Rotor I turnover position is Q : if reached Rotor II increment,
-- Rotor II turnover position  is E : if reached Rotor III increment.
+- Rotor II turnover position is E : if reached Rotor III increment.
 
 We setup the machine to the A-D-Q position and we increment the Rotor I.
 
 Expected rotation:
 
-| III | II  |  I  |
-|-----|-----|-----|
-|  A  |  D  |  Q  |
-|  A  |  E  |  R  |
-|  A  |  E  |  S  |
+| III | II  | I   |
+| --- | --- | --- |
+| A   | D   | Q   |
+| A   | E   | R   |
+| A   | E   | S   |
 
 Double stepping rotation:
 
-| III | II  |  I  |
-|-----|-----|-----|
-|  A  |  D  |  Q  |
-|  A  |  E  |  R  |
-|  B  |  F  |  S  |
+| III | II  | I   |
+| --- | --- | --- |
+| A   | D   | Q   |
+| A   | E   | R   |
+| B   | F   | S   |
 
 Rotor III, II and I increment. This software enables double stepping rotation by default as it was present on the M3 and M4 machine. You can desactivate this behaviour by setting `double_stepping=False` in the [Machine constructor](enigma/machine.py).
 
@@ -125,22 +129,22 @@ We use this notation : `AE BF CM DQ HU JN LX PR SZ VW`. Every pairs are space se
 
 We use the M3 machine and the following setup:
 
-| Object        | Value                             |
-|---------------|-----------------------------------|
-| Reflector     | C                                 |
-| Rotors        | III-II-I                          |
-| Positions     | A-B-C                             |
-| Ringstellung  | D-E-F                             |
-| Plugboard     | qd fe rw jn il ps cm ax kg yu     |
-| Text          | Hello world                       |
+| Object       | Value                         |
+| ------------ | ----------------------------- |
+| Reflector    | C                             |
+| Rotors       | III-II-I                      |
+| Positions    | A-B-C                         |
+| Ringstellung | D-E-F                         |
+| Plugboard    | qd fe rw jn il ps cm ax kg yu |
+| Text         | Hello world                   |
 
-The enigma produces: ```fsqsj fusta```
+The enigma produces: `fsqsj fusta`
 
 ## Usage
 
 We want to decode the following message: `xgytk npnkq ssnxw kyf` with the settings extracted from the above example.
 
-Start by initialise a plugboard, A plugboard object contains from 0 to 10 pairs of letters. A letter can only appears one time in the plugboard.
+We initialise a plugboard. A plugboard object contains from 0 to 10 pairs of letters. A letter can only appears one time in the plugboard.
 
 ```python
 from enigma.plugboard import Plugboard
@@ -148,7 +152,7 @@ from enigma.plugboard import Plugboard
 plugboard = Plugboard("qd fe rw jn il ps cm ax kg yu")
 ```
 
-Then make the machine using the predefined rotors (see below if you want to create yours).
+Then, we construct the machine using the predefined M3 rotors from the `engima.rotor.Rotors` class (see below if you want to create yours).
 
 ```python
 from enigma.rotor import Rotors
@@ -187,7 +191,6 @@ plaintext = M3.encode("xgytk npnkq ssnxw kyf", split=0)
 print(plaintext)
 >> alanmathisonturing
 ```
-
 
 Here is a full example using a M4 enigma machine with double stepping. We are decoding a real world message sent by GrossAdmiral Donitz on the 1st May 1945.
 
@@ -237,15 +240,17 @@ print(plaintext)
 ```
 
 The machine returns :
+
 ```
 krkrallexxfolgendesistsofortbekanntzugebenxxichhabefolgelnbebefehlerhaltenxxjansterledesbisherigxnreichsmarschallsjgoeringjsetztderfuehrersieyhvrrgrzssadmiralyalsseinennachfolgereinxschriftlschevollmachtunterwegsxabsofortsollensiesaemtlichemassnahmenverfuegenydiesichausdergegenwaertigenlageergebenxgezxreichsleiteikktulpekkjbormannjxxobxdxmmmdurnhfkstxkomxadmxuuubooiexkp
 ```
 
 After formating
+
 ```
-krkr alle xx 
-folgendes ist sofort bekanntzugeben xx 
-ich habe folgelnbe befehl erhalten xx 
+krkr alle xx
+folgendes ist sofort bekanntzugeben xx
+ich habe folgelnbe befehl erhalten xx
 j ansterle des bisherigxn reichsmarschalls j goering j setzt der fuehrer sie y hvrr grzssadmiral y als seinen nachfolger ein x schriftlsche vollmacht unterwegs x absofort sollen sie saemtliche massnahmen verfuegen y die sich aus der gegenwaertigen lage ergeben x gez x reichsleitei kk tulpe kk j bormann j xx
 ob x d x mmm durnh fkst x kom x adm x uuu booie x kp
 ```
@@ -254,22 +259,16 @@ Please see [cryptomuseum.com](https://www.cryptomuseum.com/crypto/enigma/msg/p10
 
 ## Going further
 
-You can create additionnal rotors by using the `Rotor` class from the `enigma.rotor` package.
-
-A plugboard object contains from 0 to 10 pairs of letters. A letter can only appears one time in the plugboard.
+You can randomise the plugboard and specify a number of pairs to generate. 11 is the best combination (please see [cryptomuseum.com](https://www.cryptomuseum.com/crypto/enigma/i/sb.htm)).
 
 ```python
 from enigma.plugboard import Plugboard
 
-plugboard = Plugboard("AE BF CM DQ HU JN LX PR SZ VW")
+plugboard = Plugboard("")
+plugboard.randomise(pairs=10)
 ```
 
-You can also randomise the plugboard:
-
-```python
-plugboard.randomise()
-```
-
+You can create additionnal rotors by using the `Rotor` class from the `enigma.rotor` package.
 
 A Rotor object requires an unique name, the wiring sequence containing every letter of the alphabet (len(wiring) == 26) and the turnover positions. See [rotor.py](enigma/rotor.py) for the full api description.
 
@@ -330,8 +329,8 @@ EK = Machine(
 
 ## TODO
 
-- [ ] set_rotor_position and set_rotor_ringstellung even if the rotor shares the same name
+- [ ] `set_rotor_position` and `set_rotor_ringstellung` even if the rotor shares the same name
 
-## Licence 
+## Licence
 
 MIT of course.

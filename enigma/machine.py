@@ -1,6 +1,5 @@
 import string
 from .plugboard import Plugboard
-from .rotor import Rotors
 from .utils import Letter
 
 
